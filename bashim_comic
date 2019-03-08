@@ -1,0 +1,22 @@
+// ==UserScript==
+// @name         Bash.im comic text on popup.
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  Load quote text to a pop-up on a comic strip info div.
+// @author       igrekus
+// @match        https://bash.im/strips
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    let quotes = document.getElementsByClassName('quote__author');
+    for (let i = 0; i < quotes.length; ++i) {
+        let item = quotes[i];
+        let link = item.children[2].href;
+        let parent = item.parentNode;
+        parent.title = link;
+//        console.log(link);
+    }
+})();
