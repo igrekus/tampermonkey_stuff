@@ -2,9 +2,9 @@
 // @name         Bash.im comic text on popup.
 // @namespace    http://tampermonkey.net/
 // @version      0.1
-// @description  Load quote text to a pop-up on a comic strip info div.
+// @description  try to take over the world!
 // @author       igrekus
-// @match        https://bash.im/strips
+// @match        https://bash.im/strips/*
 // @grant        none
 // ==/UserScript==
 
@@ -15,8 +15,41 @@
     for (let i = 0; i < quotes.length; ++i) {
         let item = quotes[i];
         let link = item.children[2].href;
+        let quote = '';
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', link, false);
+        // https://bash.im/quote/437755
+        xhr.send();
+        if (xhr.status != 200) {
+            console.log(xhr)
+        } else {
+            let t = xhr.responseText;
+            let start = t.search('<div class="quote__body">');
+            let end = t.search('<div class="quote__strips" data-debug="1">');
+            quote = t.substring(start + 25, end).trim();
+        }
         let parent = item.parentNode;
-        parent.title = link;
-//        console.log(link);
+
+        let span = document.createElement('div');
+        span.innerHTML = quote;
+        span.id = 'popup' + i;
+        span.style = {
+            visibility: 'hidden',
+            position: 'absolute',
+            background: 'white',
+            heignt: '40%',
+            width: '100%',
+            bottom: '-10%'
+        }
+        parent.appendChild(span);
+        parent.onmouseover = function() {
+            let el = document.getElementById('popup' + i);
+            el.style.visibility = 'visible';
+        }
+        parent.onmouseout = function() {
+            let el = document.getElementById('popup' + i);
+            el.style.visibility = 'hidden';
+        }
     }
 })();
