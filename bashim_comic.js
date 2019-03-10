@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Bash.im comic text on popup.
 // @namespace    http://tampermonkey.net/
-// @version      0.1
-// @description  try to take over the world!
+// @version      1.0
+// @description  Load quote text to a pop-up on a comic strip info div.
 // @author       igrekus
 // @match        https://bash.im/strips/*
 // @grant        none
@@ -10,7 +10,27 @@
 
 (function() {
     'use strict';
-
+/*
+    var sheet = window.document.styleSheets[0];
+    sheet.insertRule(`
+       .quote__footer:hover .popup {
+          display: block;
+       }
+       .popup {
+          display: none;
+          background: #C8C8C8;
+          margin-left: 28px;
+          padding: 10px;
+          position: absolute;
+          z-index: 1000;
+          width:100%;
+          bottom: -10%;
+          height:40%;
+       }
+       .quote__footer {
+          margin:100px;
+       }`, sheet.cssRules.length);
+*/
     let quotes = document.getElementsByClassName('quote__author');
     for (let i = 0; i < quotes.length; ++i) {
         let item = quotes[i];
@@ -29,13 +49,15 @@
             let end = t.search('<div class="quote__strips" data-debug="1">');
             quote = t.substring(start + 25, end).trim();
         }
-        let parent = item.parentNode;
 
+        let parent = item.parentNode.parentNode;
         let span = document.createElement('div');
         span.innerHTML = quote;
         span.id = 'popup' + i;
+        span.classList.add('popup');
         span.style = {
             visibility: 'hidden',
+            //display: 'none',
             position: 'absolute',
             background: 'white',
             heignt: '40%',
@@ -45,10 +67,12 @@
         parent.appendChild(span);
         parent.onmouseover = function() {
             let el = document.getElementById('popup' + i);
+            el.style.display = 'block';
             el.style.visibility = 'visible';
         }
         parent.onmouseout = function() {
             let el = document.getElementById('popup' + i);
+            el.style.display = 'none';
             el.style.visibility = 'hidden';
         }
     }
